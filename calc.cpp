@@ -32,9 +32,16 @@ double evaluateExpression(const string& expression) {
     stack<char> ops;
 
     // 入力文字列のバリデーション
-    for (char ch : expression) {
-        if (!isdigit(ch) && ch != ' ' && ch != '+' && ch != '-' && ch != '*' && ch != '/') {
-            throw runtime_error("Invalid character in expression");
+    for (size_t i = 0; i < expression.length(); i++) {
+        char ch = expression[i];
+        if (!isdigit(ch) {
+            // 負の符号の場合は次の文字が数字であることを確認
+            if (ch == '-' && i + 1 < expression.length() && isdigit(expression[i+1])) {
+                continue;
+            }
+            if (ch != ' ' && ch != '+' && ch != '-' && ch != '*' && ch != '/') {
+                throw runtime_error("Invalid character in expression");
+            }
         }
     }
 
@@ -42,18 +49,35 @@ double evaluateExpression(const string& expression) {
         // 空白をスキップ
         if (expression[i] == ' ') continue;
 
-        // 数字の場合
-        if (isdigit(expression[i])) {
+        // 数字または負の数の場合
+        if (isdigit(expression[i]) || (expression[i] == '-' && i + 1 < expression.length() && isdigit(expression[i+1]))) {
+            bool isNegative = false;
+            if (expression[i] == '-') {
+                isNegative = true;
+                i++;
+            }
+            
             double val = 0;
             while (i < expression.length() && isdigit(expression[i])) {
                 val = (val * 10) + (expression[i] - '0');
                 i++;
+            }
+            if (isNegative) {
+                val = -val;
             }
             values.push(val);
             i--;
         }
         // 演算子の場合
         else {
+            // 負の符号ではなく演算子のマイナスの場合
+            if (expression[i] == '-' && (i == 0 || expression[i-1] == '(' || 
+                expression[i-1] == '+' || expression[i-1] == '-' || 
+                expression[i-1] == '*' || expression[i-1] == '/')) {
+                // これは負の符号なので次の文字を処理
+                continue;
+            }
+            
             // 演算子の前に数字がない場合
             if (values.empty()) {
                 throw runtime_error("Invalid expression: operator without preceding number");
