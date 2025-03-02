@@ -31,6 +31,13 @@ double evaluateExpression(const string& expression) {
     stack<double> values;
     stack<char> ops;
 
+    // 入力文字列のバリデーション
+    for (char ch : expression) {
+        if (!isdigit(ch) && ch != ' ' && ch != '+' && ch != '-' && ch != '*' && ch != '/') {
+            throw runtime_error("Invalid character in expression");
+        }
+    }
+
     for (size_t i = 0; i < expression.length(); i++) {
         // 空白をスキップ
         if (expression[i] == ' ') continue;
@@ -47,7 +54,15 @@ double evaluateExpression(const string& expression) {
         }
         // 演算子の場合
         else {
+            // 演算子の前に数字がない場合
+            if (values.empty()) {
+                throw runtime_error("Invalid expression: operator without preceding number");
+            }
+
             while (!ops.empty() && precedence(ops.top()) >= precedence(expression[i])) {
+                if (values.size() < 2) {
+                    throw runtime_error("Invalid expression: not enough operands");
+                }
                 double val2 = values.top(); values.pop();
                 double val1 = values.top(); values.pop();
                 char op = ops.top(); ops.pop();
@@ -59,10 +74,17 @@ double evaluateExpression(const string& expression) {
 
     // 残りの演算を実行
     while (!ops.empty()) {
+        if (values.size() < 2) {
+            throw runtime_error("Invalid expression: not enough operands");
+        }
         double val2 = values.top(); values.pop();
         double val1 = values.top(); values.pop();
         char op = ops.top(); ops.pop();
         values.push(applyOperation(val1, val2, op));
+    }
+
+    if (values.size() != 1) {
+        throw runtime_error("Invalid expression: too many operands");
     }
 
     return values.top();
