@@ -75,6 +75,14 @@ double evaluateExpression(const string& expression) {
                 expression[i-1] == '+' || expression[i-1] == '-' || 
                 expression[i-1] == '*' || expression[i-1] == '/')) {
                 // これは負の符号なので次の文字を処理
+                i++;
+                double val = 0;
+                while (i < expression.length() && isdigit(expression[i])) {
+                    val = (val * 10) + (expression[i] - '0');
+                    i++;
+                }
+                values.push(-val);
+                i--;
                 continue;
             }
             
