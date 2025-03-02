@@ -34,7 +34,7 @@ double evaluateExpression(const string& expression) {
     // 入力文字列のバリデーション
     for (size_t i = 0; i < expression.length(); i++) {
         char ch = expression[i];
-        if (!isdigit(ch) {
+        if (!isdigit(ch)) {
             // 負の符号の場合は次の文字が数字であることを確認
             if (ch == '-' && i + 1 < expression.length() && isdigit(expression[i+1])) {
                 continue;
